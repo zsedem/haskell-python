@@ -25,9 +25,9 @@ sample = Arguments{plugin = def &= help "The Python Plugin to load"}
 main :: IO ()
 main = do
     Arguments {..} <- cmdArgs sample
-    handle pyExceptionHandlerWithoutPythonTraceback $ Py.initialize
+    handle pyExceptionHandlerWithoutPythonTraceback Py.initialize
     handle pyExceptionHandler $ runPlugin plugin
---    handle pyExceptionHandlerWithoutPythonTraceback $ Py.finalize
+    handle pyExceptionHandlerWithoutPythonTraceback Py.finalize
     print $ sum $ take 10002 [(1::Int)..]
   where
     pyExceptionHandler :: PyExc.Exception -> IO ()
@@ -41,7 +41,7 @@ main = do
         _ <- Py.call print_exc args kwargs
         return ()
     pyExceptionHandlerWithoutPythonTraceback :: PyExc.Exception -> IO ()
-    pyExceptionHandlerWithoutPythonTraceback exception = do
+    pyExceptionHandlerWithoutPythonTraceback exception =
         putStrLn "Unexpected Python exception (Please report a bug)"
 
 runPlugin :: FilePath -> IO ()
@@ -60,10 +60,19 @@ runPlugin plugin = do
 
 capsulate :: a -> IO PyCapsule.Capsule
 capsulate x = do
+    -- The garbage collecting is pretty funny in this case:
+    -- When Haskell GC will find the PyCapsule, then it calls
+    -- derefence only! (since Python might use it somewhere)
+    -- Then actually Python GC will free the memory of this
+    -- stablePtr
+    --
+    -- You need my fork of haskell-cpython for this to work,
+    -- otherwise you will see a Segmentation fault or a GHC
+    -- error message about wrong Pointer usage
     stablePtr <- newStablePtr x
     let ptr = castStablePtrToPtr stablePtr
         destructor ptr = void $
-            deRefStablePtr stablePtr
+            deRefStablePtr stablePt
     PyCapsule.new ptr (Just "Emitter") destructor
 
 incapsulate :: PyCapsule.Capsule -> IO a
