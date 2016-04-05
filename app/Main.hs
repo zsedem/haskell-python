@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards, DeriveDataTypeable #-}
+{-# LANGUAGE RecordWildCards, DeriveDataTypeable,
+             QuasiQuotes, TemplateHaskell #-}
 module Main where
 
 import qualified CPython as Py
@@ -11,12 +12,12 @@ import qualified CPython.Types.Unicode as PyUnicode
 import qualified CPython.Types.Exception as PyExc
 import Data.Text hiding(take)
 import Emitter
+import Embed
 import System.Console.CmdArgs
 import System.Exit(exitSuccess)
 import Foreign.StablePtr
 import Foreign.Ptr
 import Foreign.C.String
-import Control.Concurrent(threadDelay)
 
 data Arguments = Arguments {plugin :: FilePath} deriving (Show, Data, Typeable)
 sample = Arguments{plugin = def &= help "The Python Plugin to load"}
@@ -25,6 +26,8 @@ sample = Arguments{plugin = def &= help "The Python Plugin to load"}
 main :: IO ()
 main = do
     Arguments {..} <- cmdArgs sample
+    registerTheEmbededModule
+    print "embeded module registered, i hope"
     handle pyExceptionHandlerWithoutPythonTraceback Py.initialize
     handle pyExceptionHandler $ runPlugin plugin
     handle pyExceptionHandlerWithoutPythonTraceback Py.finalize
@@ -72,8 +75,10 @@ capsulate x = do
     stablePtr <- newStablePtr x
     let ptr = castStablePtrToPtr stablePtr
         destructor ptr = void $
-            deRefStablePtr stablePt
+            deRefStablePtr stablePtr
     PyCapsule.new ptr (Just "Emitter") destructor
+
+
 
 incapsulate :: PyCapsule.Capsule -> IO a
 incapsulate capsule = do

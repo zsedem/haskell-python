@@ -31,6 +31,8 @@ executable haskell-python-example
   hs-source-dirs:      app, prelude
   ghc-options:         -debug
   main-is:             Main.hs
+  c-sources:           app/Embed.c
+  cc-options:          -O2 -Wall -debug
   default-extensions:  GeneralizedNewtypeDeriving
                      , OverloadedStrings
   build-depends:       base
@@ -40,6 +42,7 @@ executable haskell-python-example
                      , basic-prelude
                      , cpython
                      , text
+                     , inline-c
   other-modules:       Prelude
   default-language:    Haskell2010
 
