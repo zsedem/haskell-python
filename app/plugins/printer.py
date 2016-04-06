@@ -5,10 +5,11 @@ class Printer(object):
         print("load")
         self.a = ['a']
 
-    def run(self, *args, **kwargs):
+    def run(self, emitter, **kwargs):
         print("self.a = {}".format(self.a))
-        print("*args = {}".format(args))
+        print("*args = {}".format(emitter))
         print("*kwargs = {}".format(kwargs))
         import emb
-        emb.listmutator(self.a)
+        print(emb.listmutator)
+        emb.listmutator(emitter, {'a': 'b'})
         print("self.a = {}".format(self.a))

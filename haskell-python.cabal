@@ -25,19 +25,18 @@ library
                      , cpython >= 3.4
                      , text >= 1.0
   default-language:    Haskell2010
-  ghc-options:         -debug
 
 executable haskell-python-example
   hs-source-dirs:      app, prelude
-  ghc-options:         -debug
   main-is:             Main.hs
   c-sources:           app/Embed.c
-  cc-options:          -O2 -Wall -debug
+  cc-options:          -O2 -Wall
   default-extensions:  GeneralizedNewtypeDeriving
                      , OverloadedStrings
   build-depends:       base
                      , haskell-python
                      , cmdargs
+                     , containers
                      , mtl
                      , basic-prelude
                      , cpython
