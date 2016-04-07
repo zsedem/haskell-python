@@ -1,4 +1,3 @@
-{-# LANGUAGE ForeignFunctionInterface #-}
 module Emitter where
 import Foreign.Ptr
 import Foreign.C.String

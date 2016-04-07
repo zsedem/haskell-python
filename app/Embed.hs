@@ -61,10 +61,7 @@ capsulate x = do
     let ptr = castStablePtrToPtr stablePtr
         destructor ptr = void $
             deRefStablePtr stablePtr
-    capsule <- PyCapsule.new ptr (Just "Emitter") destructor
-    return capsule
-
-
+    PyCapsule.new ptr (Just "Emitter") destructor
 
 incapsulate :: PyCapsule.Capsule -> IO a
 incapsulate capsule = do
