@@ -41,7 +41,6 @@ executable haskell-python-example
                      , basic-prelude
                      , cpython
                      , text
-                     , inline-c
   other-modules:       Prelude
   default-language:    Haskell2010
 

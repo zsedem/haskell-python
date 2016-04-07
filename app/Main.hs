@@ -1,5 +1,4 @@
-{-# LANGUAGE RecordWildCards, DeriveDataTypeable,
-             QuasiQuotes, TemplateHaskell #-}
+{-# LANGUAGE RecordWildCards, DeriveDataTypeable #-}
 module Main where
 
 import qualified CPython as Py
@@ -27,11 +26,9 @@ main :: IO ()
 main = do
     Arguments {..} <- cmdArgs sample
     registerTheEmbededModule
-    print "embeded module registered, i hope"
     handle pyExceptionHandlerWithoutPythonTraceback Py.initialize
     handle pyExceptionHandler $ runPlugin plugin
     handle pyExceptionHandlerWithoutPythonTraceback Py.finalize
-    print $ sum $ take 10002 [(1::Int)..]
   where
     pyExceptionHandler :: PyExc.Exception -> IO ()
     pyExceptionHandler exception = handle pyExceptionHandlerWithoutPythonTraceback $ do

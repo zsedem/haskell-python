@@ -10,6 +10,6 @@ class Printer(object):
         print("*args = {}".format(emitter))
         print("*kwargs = {}".format(kwargs))
         import emb
-        print(emb.listmutator)
-        emb.listmutator(emitter, {'a': 'b'})
+        print(emb.emit)
+        emb.emit(emitter, {'a': 'b'})
         print("self.a = {}".format(self.a))

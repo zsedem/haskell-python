@@ -2,6 +2,7 @@
 module Embed where
 import qualified CPython as Py
 import qualified CPython.Internal as Py
+import qualified CPython.Constants as Py
 import qualified CPython.Types.Module as Py
 import qualified CPython.Protocols.Object as Py
 import qualified CPython.Types.Capsule as PyCapsule
@@ -14,11 +15,12 @@ import Emitter
 import System.Console.CmdArgs
 import System.Exit(exitSuccess)
 import Foreign.StablePtr
+import Foreign.ForeignPtr.Unsafe
 import Foreign.Ptr
 import Foreign.Concurrent
 import Foreign.C.String
 
-type EmitCFunction = Ptr () -> Ptr () -> IO ()
+type EmitCFunction = Ptr () -> Ptr () -> IO (Ptr ())
 
 foreign import ccall "embeded_module_init"
     embeded_module_init :: FunPtr EmitCFunction
@@ -35,10 +37,14 @@ emitCFunction :: EmitCFunction
 emitCFunction _self_ptr argtuple_ptr = do
     [maycapsule, object] <- PyTuple.fromTuple =<< Py.fromForeignPtr <$> newForeignPtr (castPtr argtuple_ptr) (return ())
     Just capsule <- Py.cast maycapsule
-    print capsule
     emitter <- incapsulate capsule :: IO Emitter
-    print emitter
-    return ()
+    returnNone
+returnNone :: IO (Ptr ())
+returnNone = do
+    Py.SomeObject foreignPtrOfNone <- Py.none
+    let none = unsafeForeignPtrToPtr foreignPtrOfNone
+    Py.incref none
+    return $ castPtr none
 
 capsulate :: a -> IO PyCapsule.Capsule
 capsulate x = do
@@ -56,8 +62,6 @@ capsulate x = do
         destructor ptr = void $
             deRefStablePtr stablePtr
     capsule <- PyCapsule.new ptr (Just "Emitter") destructor
-    print ptr
-    print capsule
     return capsule
 
 
