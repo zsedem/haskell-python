@@ -6,7 +6,7 @@ resolver: lts-5.8
 # Local packages, usually specified by relative directory name
 packages:
 - '.'
-- '../haskell-cpython'
+- 'deps/haskell-cpython'
 
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
 extra-deps:

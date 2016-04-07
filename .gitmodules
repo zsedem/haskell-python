@@ -1,0 +1,3 @@
+[submodule "deps/haskell-cpython"]
+	path = deps/haskell-cpython
+	url = git@github.com:zsedem/haskell-cpython.git
